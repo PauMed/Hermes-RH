@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" layout:decorator="layout">
+<head lang="en">
+    <meta charset="UTF-8"/>
+    <title></title>
+</head>
+<body>
+<th:block layout:fragment="titulo">
+    Título <small>subtítulo</small>
+</th:block>
+<th:block layout:fragment="breadcrumb">
+    <li>
+        <a href="/vacantes">Vacantes</a>
+    </li>
+</th:block>
+<div layout:fragment="content">
+
+<!-- BEGIN TABLE PORTLET-->
+    <div class="portlet box red-flamingo">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-users"></i>Vacantes
+            </div>
+            <div class="actions">
+                <button class="btn btn-circle btn-default" data-toggle="modal" data-target="#savePuestoModal" ng-click="clear()">
+                        <span class="icon-note"></span> <span translate="hermesApp.puesto.home.createLabel">Agregar vacantes</span>
+                    </button>
+
+                <div class="btn-group">
+                    <a class="btn btn-default btn-circle" href="#" data-toggle="dropdown">
+                        <i class="fa fa-share"></i>
+                        <span class="hidden-480">
+                        Herramientas </span>
+                        <i class="fa fa-angle-down"></i>
+                    </a>
+                    <ul class="dropdown-menu pull-right">
+                        <li>
+                            <a href="#" id="xlsLink" download="usuarios.xls" onClick ="$('#table').tableExport({type:'excel',escape:'false'});">
+                                Exportar a Excel </a>
+                        </li>
+                        <li>
+                            <a href="#" id="csvLink" download="usuarios.csv" onclick="$('#table').tableExport({type:'csv',escape:'false'});">
+                                Exportar a CSV </a>
+                        </li>
+                        <li>
+                            <a href="#" id="xmlLink" download="usuarios.xml" onclick="$('#table').tableExport({type:'xml',escape:'false'});">
+                                Exportar a XML </a>
+                        </li>
+                        <!--<li class="divider">
+                        </li>
+                        <li>
+                            <a href="#">
+                            Imprimir </a>
+                        </li>-->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover" id="table">
+                    <thead>
+                    <tr>
+                        <th>
+                            ID
+                        </th>
+                        <th>
+                            Descripción
+                        </th>
+                        <th>
+                            Tipo Contrato
+                        </th>
+                        <th>
+                            Responsabilidades
+                        </th>
+                        <th>
+
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="puesto, i : ${puestos}">
+                                    <td th:text="${puesto.id}"></td>
+                                    <td th:text="${puesto.descripcion}"></td>
+                                    <td th:text="${puesto.tipo_contrato}"></td>
+                                    <td th:text="${puesto.responsabilidades.substring(0,30)}"></td>
+                                    <!--<td>{{puesto.sueldo}}</td>-->
+                                    <!--<td>{{puesto.nivel_academico}}</td>
+                                    <td>{{puesto.experiencia_laboral}}</td>
+                                    <td>{{puesto.conocimientos}}</td>
+                                    <td>{{puesto.aptitudes}}</td>-->
+                                    <td>
+                                        <a th:href="${'/vacante/'+puesto.id}" data-target="#ajax" data-toggle="modal"
+                                           class="btn btn-info">
+                                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp;<span> Ver</span>
+                                        </a>
+                                        <a th:href="${'/vacante/'+puesto.id+'?readonly=0'}" data-target="#ajax" data-toggle="modal"
+                                           class="btn btn-primary">
+                                            <span class="glyphicon glyphicon-pencil"></span>&nbsp;<span> Editar</span>
+                                        </a>
+                                        <button type="button"
+                                                class="btn btn-danger" onclick="alert('Ésto es sólo un prototipo');">
+                                            <span class="glyphicon glyphicon-remove-circle"></span>&nbsp;<span> Archivar</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- END TABLE PORTLET-->
+
+
+    <div class="modal fade" id="savePuestoModal" tabindex="-1" role="dialog" aria-labelledby="myPuestoLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/vacantes}" name="editForm" role="form" novalidate="novalidate" ng-submit="create()" method="post">
+
+                    <!--<div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                                ng-click="clear()">&times;</button>
+                        <h4 class="modal-title" id="myPuestoLabel" translate="hermesApp.puesto.home.createOrEditLabel">Create or edit a Puesto</h4>
+                    </div>-->
+                    <div class="modal-body">
+                        <div class="tabbable-line">
+                        <ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+                            <li class="active"><a href="#tab_1_1" data-toggle="tab"> Información </a></li>
+                            <li><a href="#tab_1_2" data-toggle="tab"> Perfil </a></li>
+                            <li><a href="#tab_1_3" data-toggle="tab"> Pruebas </a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade active in" id="tab_1_1">
+                                <div class="form-group">
+                                    <label>ID</label>
+                                    <input type="text" class="form-control" name="id"
+                                           ng-model="puesto.id" readonly="readonly"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.descripcion">Descripción</label>
+                                    <input type="text" class="form-control" name="descripcion"/>
+
+                                </div>
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.tipo_contrato">Tipo de contrato</label>
+                                    <input type="text" class="form-control" name="tipo_contrato"/>
+                                </div>
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.responsabilidades">Responsabilidades</label>
+                                    <textarea class="form-control" name="responsabilidades" rows="3">
+
+                                    </textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.sueldo">Sueldo</label>
+                                    <input type="number" class="form-control" name="sueldo"
+                                           ng-model="puesto.sueldo"/>
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab_1_2">
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.nivel_academico">Nivel académico</label>
+                                    <textarea name="nivel_academico" rows="3" class="form-control"></textarea>
+
+                                </div>
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.experiencia_laboral">Experiencia laboral</label>
+                                    <textarea name="experiencia_laboral" rows="3" class="form-control"></textarea>
+
+                                </div>
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.conocimientos">Conocimientos</label>
+                                    <textarea name="conocimientos" rows="3" class="form-control"></textarea>
+
+                                </div>
+                                <div class="form-group">
+                                    <label translate="hermesApp.puesto.aptitudes">Aptitudes</label>
+                                    <textarea name="aptitudes" rows="3" class="form-control"></textarea>
+
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab_1_3">
+                                <select multiple="multiple" class="multi-select" id="my_multi_select1" name="pruebas_asignadas" th:readonly="${readonly}">
+                                    <option th:each="prueba, i : ${pruebas}" th:text="${prueba.nombre}" th:value="${prueba.id}">Dallas Cowboys</option>
+                                </select>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="clear()">
+                            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span translate="entity.action.cancel">Cancelar</span>
+                        </button>
+                        <button type="submit" ng-disabled="editForm.$invalid" class="btn btn-primary">
+                            <span class="glyphicon glyphicon-save"></span>&nbsp;<span translate="entity.action.save">Guardar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Generic Modal -->
+    <div class="modal fade" id="ajax" role="basic" aria-hidden="true">
+        <div class="page-loading page-loading-boxed">
+            <img src="img/loading-spinner-grey.gif" alt="" class="loading"/>
+                    <span>
+                    &nbsp;&nbsp;Cargando... </span>
+        </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+</div>
+<div layout:fragment="scripts">
+    <!-- BEGIN PAGE LEVEL STYLES -->
+    <link href="/plugins/select2/select2.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="/plugins/jquery-multi-select/css/multi-select.css"/>
+    <!-- END PAGE LEVEL STYLES -->
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    <script src="/plugins/fancybox/source/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" src="/plugins/select2/select2.min.js"></script>
+    <script type="text/javascript" src="/plugins/htmltable_export/tableExport.js"></script>
+    <script type="text/javascript" src="/plugins/htmltable_export/jquery.base64.js"></script>
+    <script type="text/javascript" src="/plugins/jquery-multi-select/js/jquery.multi-select.js"></script>
+    <!-- END PAGE LEVEL PLUGINS-->
+    <script>
+        jQuery(document).ready(function() {
+            $('.multi-select').multiSelect({selectableHeader:"Disponibles", selectionHeader:"Asignadas"});
+            $("#ajax").on('hidden.bs.modal', function () {
+                $(this).data('bs.modal', null);
+
+            });
+        });
+    </script>
+</div>
+</body>
+</html>
